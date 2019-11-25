@@ -2,7 +2,7 @@ __author__ = 'teemu kanstren'
 
 from datetime import datetime
 from monero import rpc
-from monero.transaction import Transaction, TxIn, TxOut
+from monero.transaction import Transaction, TxIn, TxOut, OutDetails
 from decimal import Decimal
 import json
 
@@ -53,8 +53,15 @@ def get_transactions(tx_hashes):
             for key in key_offsets_cum:
                 out_params.append({"amount": amount, "index": key})
             out_details = rpc.raw_request('/get_outs', {"outputs": out_params})
+            out_detail_objs = []
+            credits = out_details["credits"]
+            untrusted = out_details["untrusted"]
+            top_hash = out_details["top_hash"]
+            for out in out_details["outs"]:
+                out_obj = OutDetails(out["height"], out["key"], out["mask"], out["txid"], out["unlocked"])
+                out_detail_objs.append(out_obj)
 #            out_details = rpc.raw_request('/get_outs', {"outputs": [{'amount': amount, "index": key_offsets_cum}]})
-            tx_in = TxIn(amount, key_offsets, key_image, out_details)
+            tx_in = TxIn(amount, key_offsets, key_image, out_detail_objs)
             t.tx_ins.append(tx_in)
 
         outputs = tx["vout"]

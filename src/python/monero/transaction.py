@@ -1,10 +1,24 @@
 __author__ = 'teemu kanstren'
 
+class OutDetails:
+    height = None
+    key_hex = None
+    mask_hex = None
+    tx_id = None
+    unlocked = None
+
+    def __init__(self, height, key_hex, mask_hex, tx_id, unlocked):
+        self.height = height
+        self.key_hex = key_hex
+        self.mask_hex = mask_hex
+        self.tx_id = tx_id
+        self.unlocked = unlocked
+
 class TxIn:
     amount = None
     key_offsets = []
     key_image = None
-    out_details = None
+    out_details = []
 
     def __init__(self, amount, key_offsets, key_image, out_details):
         self.amount = amount
