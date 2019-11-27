@@ -12,19 +12,21 @@ TABLES['transactions'] = """
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
 """
 
+#map tx_ins to transactions
 TABLES['tx_txins'] = """
     CREATE TABLE tx_txins (
         tx_id BIGINT NOT NULL AUTO_INCREMENT,
         txin_id BIGINT UNSIGNED NOT NULL,
-        PRIMARY KEY (hash)
+        PRIMARY KEY (tx_id, txin_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
 """
 
+#map tx_outs to transactions
 TABLES['tx_txouts'] = """
     CREATE TABLE tx_txouts (
         tx_id BIGINT NOT NULL AUTO_INCREMENT,
         txout_id BIGINT UNSIGNED NOT NULL,
-        PRIMARY KEY (hash)
+        PRIMARY KEY (tx_id, txout_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
 """
 
@@ -34,7 +36,7 @@ TABLES['txins'] = """
         txin_id BIGINT NOT NULL AUTO_INCREMENT,
         amount BIGINT UNSIGNED NOT NULL,
         keyimage CHAR(32) NOT NULL,
-        PRIMARY KEY (hash)
+        PRIMARY KEY (txin_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
 """
 
@@ -42,7 +44,7 @@ TABLES['key_offsets'] = """
     CREATE TABLE key_offsets (
         txin_id BIGINT,
         offset BIGINT UNSIGNED NOT NULL,
-        PRIMARY KEY (hash)
+        PRIMARY KEY (txin_id, offset)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
 """
 
@@ -62,6 +64,6 @@ TABLES['txouts'] = """
         txout_id BIGINT NOT NULL AUTO_INCREMENT,
         amount BIGINT UNSIGNED NOT NULL,
         keyimage CHAR(32) NOT NULL,
-        PRIMARY KEY (hash)
+        PRIMARY KEY (txout_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
 """

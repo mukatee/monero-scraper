@@ -33,6 +33,7 @@ def get_transactions(tx_hashes):
     tx_dicts = [json.loads(tx) for tx in transactions["txs_as_json"]]
     idx = 0
     for tx in tx_dicts:
+        #transaction version, havent found the version table yet
         version = tx["version"]
         unlock_time = tx["unlock_time"] #the time when output is spendable
         inputs = tx["vin"]
@@ -42,6 +43,7 @@ def get_transactions(tx_hashes):
         t = Transaction(version, hash_hex, fee, unlock_time)
         #pop "gen" first
         for inp in inputs:
+            #key is actually list of output key id's that are included as tx_ins in the transaction
             key = inp["key"]
             key_offsets = key["key_offsets"]
             key_image = key["k_image"]
@@ -51,13 +53,18 @@ def get_transactions(tx_hashes):
                 key_offsets_cum.append(key+key_offsets_cum[-1])
             out_params = []
             for key in key_offsets_cum:
+                #the api for get_outs requires amount and index. earlier in the chain amount is there, later not.
                 out_params.append({"amount": amount, "index": key})
             out_details = rpc.raw_request('/get_outs', {"outputs": out_params})
             out_detail_objs = []
+            #credits is not mentioned in daemon api docs
             credits = out_details["credits"]
+            #if obtained in bootstrap mode, labeled as untrusted (daemon api docs...)
             untrusted = out_details["untrusted"]
+            #top hash is not mentioned in daemon api docs
             top_hash = out_details["top_hash"]
             for out in out_details["outs"]:
+                #output keys are receiver stealth address public keys
                 out_obj = OutDetails(out["height"], out["key"], out["mask"], out["txid"], out["unlocked"])
                 out_detail_objs.append(out_obj)
 #            out_details = rpc.raw_request('/get_outs', {"outputs": [{'amount': amount, "index": key_offsets_cum}]})
