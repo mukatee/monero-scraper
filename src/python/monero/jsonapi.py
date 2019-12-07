@@ -22,16 +22,26 @@ def get_block(hash = None, height = None):
         res = rpc.raw_jsonrpc_request('get_block', {'hash': hash})
     else:
         res = rpc.raw_jsonrpc_request('get_block', {'height': height})
+    objs = json.loads(res["json"])
+    #merge the two dicts: https://stackoverflow.com/questions/38987/how-do-i-merge-two-dictionaries-in-a-single-expression
+    #this pulls the contents of the "json" key up to top level on "res", and turns them into actual dict keys
+    for k in objs:
+        if k not in res["block_header"]:
+            res[k] = objs[k]
+#    res = {**res, **objs}
     return res
 
 #https://monero.stackexchange.com/questions/3958/what-is-the-format-of-a-block-in-the-monero-blockchain
 #https://monero.stackexchange.com/questions/7576/rpc-method-to-translate-key-offsets
 #https://monero.stackexchange.com/questions/2136/understanding-the-structure-of-a-monero-transaction/2150#2150
 def get_transactions(tx_hashes):
+    if len(tx_hashes) == 0:
+        return []
     # need decode_as_json to get actual vin and a vout values for transaction inputs and outputs
     transactions = rpc.raw_request('/get_transactions', {'txs_hashes': tx_hashes, "decode_as_json": True})
-    tx_dicts = [json.loads(tx) for tx in transactions["txs_as_json"]]
+    tx_dicts = [json.loads(tx) for tx in transactions["txs"]["as_json"]]
     idx = 0
+    #TODO: move creation of transactions to transaction.py
     for tx in tx_dicts:
         #transaction version, havent found the version table yet
         version = tx["version"]

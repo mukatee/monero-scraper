@@ -1,14 +1,23 @@
+import os
+
 TABLES = {}
+
+DB_NAME = "xmr"
+CREATE_DB_SQL = "CREATE DATABASE IF NOT EXISTS "+DB_NAME+" DEFAULT CHARACTER SET 'utf8'"
+DB_HOST = os.environ['DB_HOST']
+DB_NAME = os.environ['DB_NAME']
+DB_USER = os.environ['DB_USER']
+DB_PW = os.environ['DB_USER_PW']
 
 TABLES['transactions'] = """
     CREATE TABLE transactions (
         tx_id BIGINT UNSIGNED NOT NULL,
         version TINYINT UNSIGNED NOT NULL,
-        hash CHAR(32) NOT NULL,
+        hash BIGINT NOT NULL,
         fee BIGINT,
         height BIGINT,
         unlocktime DATETIME,
-        PRIMARY KEY (hash)
+        PRIMARY KEY (tx_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
 """
 
@@ -31,11 +40,13 @@ TABLES['tx_txouts'] = """
 """
 
 #TODO: is autoincrement ok or not? or need to track transactions otherwise?
+#TODO: check keyimages and other CHAR sizes
+#https://monero.stackexchange.com/questions/2883/what-is-a-key-image
 TABLES['txins'] = """
     CREATE TABLE txins (
         txin_id BIGINT NOT NULL AUTO_INCREMENT,
         amount BIGINT UNSIGNED NOT NULL,
-        keyimage CHAR(32) NOT NULL,
+        keyimage BIGINT NOT NULL,
         PRIMARY KEY (txin_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
 """
@@ -52,18 +63,19 @@ TABLES['output_details'] = """
     CREATE TABLE output_details (
         txin_id BIGINT,
         height BIGINT UNSIGNED NOT NULL,
-        key_hex CHAR(32) NOT NULL,
-        mask_hex CHAR(32) NOT NULL,
+        key_hex BIGINT NOT NULL,
+        mask_hex BIGINT NOT NULL,
         unlocked BOOLEAN NOT NULL,
-        PRIMARY KEY (hash)
+        PRIMARY KEY (txin_id, height, key_hex)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
 """
 
 TABLES['txouts'] = """
-    CREATE TABLE txins (
+    CREATE TABLE txouts (
         txout_id BIGINT NOT NULL AUTO_INCREMENT,
         amount BIGINT UNSIGNED NOT NULL,
-        keyimage CHAR(32) NOT NULL,
+        keyimage BIGINT NOT NULL,
         PRIMARY KEY (txout_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
 """
+
