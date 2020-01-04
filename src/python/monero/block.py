@@ -1,6 +1,8 @@
 __author__ = 'teemu kanstren'
 
 from .transaction import Transaction
+from . import jsonapi
+from typing import Dict, List
 
 #following fields seem to be from "json" field copied into block_header:
 #- major_version
@@ -38,10 +40,10 @@ class Block:
     status = ""
     top_hash = ""
     untrusted = ""
-    miner_tx = Transaction()
-    tx_hashes = ["hash"]
+    miner_tx: Transaction = None
+    tx_hashes: List = None
 
-    def __init__(self, rpc_dict):
+    def __init__(self, rpc_dict: Dict):
         header = rpc_dict["block_header"]
         self.height = header["height"]
         self.block_size = header["block_size"]
@@ -62,11 +64,10 @@ class Block:
         self.timestamp = header["timestamp"]
         self.wide_cumulative_difficulty = header["wide_cumulative_difficulty"]
         self.wide_difficulty = header["wide_difficulty"]
-        self.credits = header["credits"]
-        self.status = header["status"]
-        self.top_hash = header["top_hash"]
-        self.untrusted = header["untrusted"]
-        self.status = header["status"]
-        #TODO: move transaction creation to transaction.py and use it here
-        self.miner_tx =
-        self.tx_hashes =
+        self.credits = rpc_dict["credits"]
+        self.status = rpc_dict["status"]
+        self.top_hash = rpc_dict["top_hash"]
+        self.untrusted = rpc_dict["untrusted"]
+        miner_tx_hash_list = [header["miner_tx_hash"]]
+        self.miner_tx = jsonapi.get_transactions(miner_tx_hash_list)[0]
+        self.txs = jsonapi.get_transactions(rpc_dict["tx_hashes"])

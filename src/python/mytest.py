@@ -10,14 +10,16 @@ info = daemon.info()
 print(info)
 #-1 throws
 #block = daemon.get_block(height=1412880)
-block = daemon.get_block(height=14128)
+block = daemon.get_block(height=1412880)
 print(block)
 #coinbase_tx_hash = block["block_header"]["miner_tx_hash"]
 #print(coinbase_tx_hash)
 #cb_transactions = daemon.get_transactions([coinbase_tx_hash])
 #print(cb_transactions)
-other_tx_hashes = block["tx_hashes"]
-transactions = daemon.get_transactions(other_tx_hashes)
-print(transactions)
+print(block.txs)
+print(daemon.get_height())
 mempool = daemon.mempool()
+print(mempool)
+top_height = daemon.get_height() - 1
+block = daemon.get_block(height=top_height)
 pass
