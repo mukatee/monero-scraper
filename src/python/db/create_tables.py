@@ -4,32 +4,48 @@ __author__ = 'teemu kanstren'
 
 import mysql.connector as mariadb
 from mysql.connector import errorcode
-from db import sql
+import os
+
+DB_NAME = "xmr"
+CREATE_DB_SQL = "CREATE DATABASE IF NOT EXISTS "+DB_NAME+" DEFAULT CHARACTER SET 'utf8'"
+DB_HOST = os.environ['DB_HOST']
+DB_NAME = os.environ['DB_NAME']
+DB_USER = os.environ['DB_USER']
+DB_PW = os.environ['DB_USER_PW']
 
 def create_database(cnx, cursor):
     try:
-        cursor.execute(f"USE {sql.DB_NAME}")
-        print(f"Using existing DB {sql.DB_NAME}")
+        cursor.execute(f"USE {DB_NAME}")
+        print(f"Using existing DB {DB_NAME}")
     except mariadb.Error as err:
-        print(f"Database {sql.DB_NAME} does not exists.")
+        print(f"Database {DB_NAME} does not exists.")
         if err.errno == errorcode.ER_BAD_DB_ERROR:
             try:
-                cursor.execute(sql.CREATE_DB_SQL)
+                cursor.execute(CREATE_DB_SQL)
             except mariadb.Error as err:
                 print(f"Failed creating database: {err}")
                 exit(1)
-            print(f"Database {sql.DB_NAME} created successfully.")
-            cnx.database = sql.DB_NAME
+            print(f"Database {DB_NAME} created successfully.")
+            cnx.database = DB_NAME
+            cursor.execute(f"USE {DB_NAME}")
+            print(f"Using existing DB {DB_NAME}")
         else:
             print(err)
             exit(1)
 
 def create_tables(cursor):
-    for table_name in sql.TABLES:
-        table_description = sql.TABLES[table_name]
+    my_path = os.path.dirname(os.path.realpath(__file__))
+    with open(f'{my_path}/create_tables.sql', 'r') as file:
+        sql = file.read()
+    tables_sql = sql.split(";")
+    tables_sql = [table_sql.strip() for table_sql in tables_sql]
+    for table_sql in tables_sql:
+        if len(table_sql) < 10:
+            #skip any short cruft created by split()
+            continue
+        print(f"Creating table:\n{table_sql}")
         try:
-            print(f"Creating table {table_name}: ", end = '')
-            cursor.execute(table_description)
+            cursor.execute(table_sql)
         except mariadb.Error as err:
             if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
                 print("already exists.")
@@ -40,12 +56,15 @@ def create_tables(cursor):
 
 
 def main():
-    cnx = mariadb.connect(host=sql.DB_HOST,
-#                                         user = sql.DB_USER, password = sql.DB_PW)
-                                         user = sql.DB_USER, password = sql.DB_PW, database = sql.DB_NAME)
+    cnx = mariadb.connect(host=DB_HOST,
+                                         user = DB_USER, password = DB_PW)
+#                                         user = DB_USER, password = DB_PW, database = DB_NAME)
     cursor = cnx.cursor()
     create_database(cnx, cursor)
     create_tables(cursor)
+    # https://stackoverflow.com/questions/11583083/python-commands-out-of-sync-you-cant-run-this-command-now
+    cursor.close()
+    cursor = cnx.cursor()
     #cursor.execute("USE "+sql.DB_NAME)
     cursor.execute("SHOW TABLES")
     result = cursor.fetchall()
