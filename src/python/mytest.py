@@ -8,9 +8,10 @@ rpc.init(_host="nodes.hashvault.pro")
 daemon = jsonapi
 info = daemon.info()
 print(info)
+mtx = daemon.get_transactions(["c6988cbd8eec02efdb6ce8e43e5c54c8af898dec8d331025248a066645a259dd"])
 #-1 throws
 #block = daemon.get_block(height=1412880)
-block = daemon.get_block(height=1412880)
+block = daemon.get_block(height=2000)
 print(block)
 #coinbase_tx_hash = block["block_header"]["miner_tx_hash"]
 #print(coinbase_tx_hash)

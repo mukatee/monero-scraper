@@ -2,6 +2,7 @@ __author__ = 'teemu kanstren'
 
 from . import rpc
 import json
+from typing import List
 
 #details about the output address for tx_out
 class OutDetails:
@@ -28,11 +29,11 @@ class TxIn:
     #amount of funds in tx_in. seems to be 0 later in the chain. have to check when it changed to 0.
     amount = None
     #offsets of keys to tx_out that this refers to. first offset is absolute, following are added on top of that. so [123,5] would mean [123, 128]
-    key_offsets = []
+    key_offsets:List[int] = []
     #not sure what this is, have to check
     key_image = None
     #list of OutDetail objects. these describe the target receiver addresses etc
-    out_details = []
+    out_details: List[OutDetails] = []
 
     def __init__(self, amount, key_offsets, key_image, out_details):
         self.amount = amount
@@ -67,9 +68,9 @@ class Transaction:
     #when was this transaction first seen
     receive_time = None
     #list of associated tx_ins for this transaction (existing tx_outs)
-    tx_ins = []
+    tx_ins: List[TxIn] = []
     #list of tx_outs to generate from this transaction
-    tx_outs = []
+    tx_outs: List[TxOut] = []
 
     def __init__(self, version, hash_hex, fee, unlock_time, receive_time):
         self.version = version

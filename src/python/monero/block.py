@@ -41,7 +41,7 @@ class Block:
     top_hash = ""
     untrusted = ""
     miner_tx: Transaction = None
-    tx_hashes: List = None
+    tx_hashes: List[Transaction] = None
 
     def __init__(self, rpc_dict: Dict):
         header = rpc_dict["block_header"]
@@ -71,3 +71,4 @@ class Block:
         miner_tx_hash_list = [header["miner_tx_hash"]]
         self.miner_tx = jsonapi.get_transactions(miner_tx_hash_list)[0]
         self.txs = jsonapi.get_transactions(rpc_dict["tx_hashes"])
+        pass

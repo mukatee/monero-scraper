@@ -46,6 +46,8 @@ def create_tables(cursor):
         print(f"Creating table:\n{table_sql}")
         try:
             cursor.execute(table_sql)
+            #it is quite confusing, but apparently even with autocommit off, you do not need to commit a create db or create table command
+            #due to some property, those are autocommitted and non-rollbackable: https://stackoverflow.com/questions/4692690/is-it-possible-to-roll-back-create-table-and-alter-table-statements-in-major-sql
         except mariadb.Error as err:
             if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
                 print("already exists.")
@@ -57,7 +59,7 @@ def create_tables(cursor):
 
 def main():
     cnx = mariadb.connect(host=DB_HOST,
-                                         user = DB_USER, password = DB_PW)
+                                         user = DB_USER, password = DB_PW,  autocommit = False)
 #                                         user = DB_USER, password = DB_PW, database = DB_NAME)
     cursor = cnx.cursor()
     create_database(cnx, cursor)
