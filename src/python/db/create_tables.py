@@ -12,6 +12,7 @@ DB_HOST = os.environ['DB_HOST']
 DB_NAME = os.environ['DB_NAME']
 DB_USER = os.environ['DB_USER']
 DB_PW = os.environ['DB_USER_PW']
+cnx = None
 
 def create_database(cnx, cursor):
     try:
@@ -55,6 +56,16 @@ def create_tables(cursor):
                 print(err.msg)
         else:
             print("OK")
+
+def get_cnx():
+    global cnx
+    if cnx is None:
+        cnx = mariadb.connect(host = DB_HOST, user = DB_USER, password = DB_PW, autocommit = False)
+        cursor = cnx.cursor()
+        cursor.execute(f"USE {DB_NAME}")
+        cnx.commit()
+        cursor.close()
+    return cnx
 
 
 def main():

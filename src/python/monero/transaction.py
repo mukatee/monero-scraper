@@ -54,6 +54,7 @@ class TxOut:
 
 #the transaction itself, containing the txins, txouts, and the rest of the details
 class Transaction:
+    tx_id = None
     #not sure what they mean, at this time the value seems to be 2
     version = None
     #hash of the transaction itself, not sure of details

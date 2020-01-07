@@ -5,7 +5,7 @@
 
     CREATE TABLE blocks (
         height INT UNSIGNED NOT NULL UNIQUE,
-        size SMALLINT UNSIGNED NOT NULL,
+        block_size SMALLINT UNSIGNED NOT NULL,
         weight SMALLINT UNSIGNED NOT NULL,
         difficulty BIGINT NOT NULL,
         cumulative_difficulty BIGINT NOT NULL,
@@ -15,7 +15,7 @@
         minor_version TINYINT UNSIGNED NOT NULL,
         nonce BIGINT UNSIGNED NOT NULL,
         reward BIGINT UNSIGNED NOT NULL,
-        timestamp BIGINT UNSIGNED NOT NULL,
+        block_time BIGINT UNSIGNED NOT NULL,
         wide_cumulative_difficulty VARCHAR(20) NOT NULL,
         wide_difficulty VARCHAR(12) NOT NULL,
         PRIMARY KEY (height)
