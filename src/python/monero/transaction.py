@@ -26,6 +26,7 @@ class OutDetails:
 
 #details about a tx_in for a transaction
 class TxIn:
+    txin_id:int = None
     #amount of funds in tx_in. seems to be 0 later in the chain. have to check when it changed to 0.
     amount = None
     #offsets of keys to tx_out that this refers to. first offset is absolute, following are added on top of that. so [123,5] would mean [123, 128]
@@ -34,12 +35,14 @@ class TxIn:
     key_image = None
     #list of OutDetail objects. these describe the target receiver addresses etc
     out_details: List[OutDetails] = []
+    coinbase: bool = False
 
-    def __init__(self, amount, key_offsets, key_image, out_details):
+    def __init__(self, amount, key_offsets, key_image, out_details, coinbase = False):
         self.amount = amount
         self.key_offsets = key_offsets
         self.key_image = key_image
         self.out_details = out_details
+        self.coinbase = coinbase
 
 #describes a tx_out. just the basic values
 class TxOut:
@@ -96,11 +99,11 @@ def from_json(tx_data, block_height):
     for inp in inputs:
         if "gen" in inp:
             #a coinbase tx input. generating coins. appears to have no other info, and will have only one txout for miner
-            amount = -1
-            key_offsets = -1
+            amount = 0
+            key_offsets = []
             key_image = ""
-            out_detail_objs = None
-            tx_in = TxIn(amount, key_offsets, key_image, out_detail_objs)
+            out_detail_objs = []
+            tx_in = TxIn(amount, key_offsets, key_image, out_detail_objs, True)
             t.tx_ins.append(tx_in)
             continue
         # key is actually list of output key id's that are included as tx_ins in the transaction

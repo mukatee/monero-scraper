@@ -39,6 +39,7 @@
         tx_id BIGINT UNSIGNED NOT NULL,
         amount BIGINT UNSIGNED NOT NULL,
         keyimage CHAR(64) NOT NULL,
+        coinbase BOOLEAN NOT NULL,
         PRIMARY KEY (txin_id),
         CONSTRAINT fk_txins_txid
           FOREIGN KEY (tx_id)
@@ -58,7 +59,7 @@
     CREATE TABLE key_offsets (
         txin_id BIGINT UNSIGNED,
         offset BIGINT UNSIGNED NOT NULL,
-        PRIMARY KEY (txin_id, offset),
+/**        PRIMARY KEY (txin_id, offset), <- key offsets are in relation to each other, so duplicates can be there. https://monero.stackexchange.com/questions/2136/understanding-the-structure-of-a-monero-transaction*/
         CONSTRAINT fk_keyoffsets_txin_id
           FOREIGN KEY (txin_id)
           REFERENCES txins (txin_id)
