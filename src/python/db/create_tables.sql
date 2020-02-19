@@ -66,6 +66,7 @@
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
     CREATE TABLE output_details (
+        tx_id BIGINT UNSIGNED,
         txin_id BIGINT UNSIGNED,
         height INT UNSIGNED NOT NULL,
         key_hex CHAR(64) NOT NULL,

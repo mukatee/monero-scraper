@@ -44,7 +44,8 @@ def get_block(hash: str = None, height: int = None) -> block.Block:
 def get_transactions(tx_hashes: List) -> List:
     if len(tx_hashes) == 0:
         return []
-    tx_hashes.append("82388254268f9887db936d20db89929f721d9cad4a5b1a1795bf05b2a511224c")
+    #what is this?
+#    tx_hashes.append("82388254268f9887db936d20db89929f721d9cad4a5b1a1795bf05b2a511224c")
     # need decode_as_json to get actual vin and a vout values for transaction inputs and outputs
     transactions = rpc.raw_request('/get_transactions', {'txs_hashes': tx_hashes, "decode_as_json": True})
     txs = []

@@ -25,7 +25,7 @@ def insert_transaction(c: MySQLCursor, t: Transaction):
             c.execute(INSERT_KEY_OFFSET, (tx_in.txin_id, keyoffset))
         for od in tx_in.out_details:
             od.tx_id = t.tx_id
-            c.execute(INSERT_OUTPUT_DETAILS, (od.tx_id, od.height, od.key_hex, od.mask_hex, od.unlocked))
+            c.execute(INSERT_OUTPUT_DETAILS, (t.tx_id, od.tx_id, od.height, od.key_hex, od.mask_hex, od.unlocked))
     for tx_out in t.tx_outs:
         c.execute(INSERT_TXOUT, (t.tx_id, tx_out.amount, tx_out.target_key))
 
