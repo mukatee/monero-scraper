@@ -7,15 +7,15 @@ from typing import List
 #details about the output address for tx_out
 class OutDetails:
     #blockchain height for this output
-    height = None
+    height:int = None
     #public key of the output (?)
-    key_hex = None
+    key_hex:str = None
     #mask - a hex string but not sure yet what it is for
-    mask_hex = None
+    mask_hex:str = None
     #this seems to be 0 in later transactions in the chain, earlier have to check..
-    tx_id = None
+    tx_id:int = None
     #is the transaction unlocked or not? i think it means the unlock time has passed and can be spent
-    unlocked = None
+    unlocked:bool = None
 
     def __init__(self, height, key_hex, mask_hex, tx_id, unlocked):
         self.height = height
@@ -35,6 +35,7 @@ class TxIn:
     key_image = None
     #list of OutDetail objects. these describe the target receiver addresses etc
     out_details: List[OutDetails] = []
+    #is this a coinbase txin?
     coinbase: bool = False
 
     def __init__(self, amount, key_offsets, key_image, out_details, coinbase = False):
@@ -82,6 +83,9 @@ class Transaction:
         self.fee = fee
         self.unlock_time = unlock_time
         self.receive_time = receive_time
+        #these are needed to overwrite the lists or they will be class-level variables. ugh
+        self.tx_inx = []
+        self.tx_outs = []
 
 def from_json(tx_data, block_height):
     tx = json.loads(tx_data)

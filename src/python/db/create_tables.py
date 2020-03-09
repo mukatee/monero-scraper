@@ -6,13 +6,12 @@ import mysql.connector as mariadb
 from mysql.connector import errorcode
 import os
 
-DB_NAME = "xmr"
-CREATE_DB_SQL = "CREATE DATABASE IF NOT EXISTS "+DB_NAME+" DEFAULT CHARACTER SET 'utf8'"
 DB_HOST = os.environ['DB_HOST']
 DB_NAME = os.environ['DB_NAME']
 DB_USER = os.environ['DB_USER']
 DB_PW = os.environ['DB_USER_PW']
 cnx = None
+CREATE_DB_SQL = "CREATE DATABASE IF NOT EXISTS "+DB_NAME+" DEFAULT CHARACTER SET 'utf8'"
 
 def create_database(cnx, cursor):
     try:
@@ -62,6 +61,7 @@ def get_cnx():
     if cnx is None:
         cnx = mariadb.connect(host = DB_HOST, user = DB_USER, password = DB_PW, autocommit = False)
         cursor = cnx.cursor()
+        print(f"switching db: USE {DB_NAME}")
         cursor.execute(f"USE {DB_NAME}")
         cnx.commit()
         cursor.close()

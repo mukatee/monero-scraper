@@ -53,7 +53,6 @@ class Block:
         self.difficulty = header["difficulty"]
         self.difficulty_top64 = header["difficulty_top64"]
         self.hash = header["hash"]
-        self.height = header["height"]
         self.long_term_weight = header["long_term_weight"]
         self.miner_tx_hash = header["miner_tx_hash"]
         self.major_version = header["major_version"]

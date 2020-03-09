@@ -50,7 +50,7 @@
         tx_id BIGINT UNSIGNED NOT NULL,
         amount BIGINT UNSIGNED NOT NULL,
         target_key CHAR(64) NOT NULL,
-        PRIMARY KEY (tx_id, target_key),
+        /* PRIMARY KEY (tx_id, target_key), */ /* <- it appears that txouts (vout in the api) are not unique. just some keys, and even amounts zeroed in later procol versions. */
         CONSTRAINT fk_txouts_txid
           FOREIGN KEY (tx_id)
           REFERENCES transactions (tx_id)
@@ -72,7 +72,7 @@
         key_hex CHAR(64) NOT NULL,
         mask_hex CHAR(64) NOT NULL,
         unlocked BOOLEAN NOT NULL,
-        PRIMARY KEY (txin_id, height, key_hex),
+        PRIMARY KEY (tx_id, txin_id, height, key_hex),
         CONSTRAINT fk_output_details_txin_id
           FOREIGN KEY (txin_id)
           REFERENCES txins (txin_id),
