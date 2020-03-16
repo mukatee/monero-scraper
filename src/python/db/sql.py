@@ -20,7 +20,7 @@ def insert_transaction(c: MySQLCursor, t: Transaction):
     with profiler.profile("sql: insert tx"):
         c.execute(INSERT_TRANSACTION, (t.version, t.hash_hex, t.fee, t.block_height, t.unlock_time))
     t.tx_id = c.lastrowid
-    print(f"inserted transaction, rows updated{c.rowcount}")
+    #print(f"inserted transaction, rows updated{c.rowcount}")
     for tx_in in t.tx_ins:
         with profiler.profile("sql: insert txin"):
             c.execute(INSERT_TXIN, (t.tx_id, tx_in.amount, tx_in.key_image, tx_in.coinbase))
@@ -35,7 +35,7 @@ def insert_transaction(c: MySQLCursor, t: Transaction):
     for tx_out in t.tx_outs:
         with profiler.profile("sql: insert txout"):
             c.execute(INSERT_TXOUT, (t.tx_id, tx_out.amount, tx_out.target_key))
-    print("hello")
+    pass
 
 def get_max_block(conn: MySQLConnection):
     c = conn.cursor()
@@ -51,7 +51,8 @@ def insert_block(conn: MySQLConnection, block: Block):
         with profiler.profile("sql: insert block"):
             c.execute(INSERT_BLOCK, (b.height, b.block_size, b.block_weight, b.difficulty, b.cumulative_difficulty, b.hash, b.long_term_weight, b.major_version, b.minor_version, b.nonce, b.reward, b.timestamp, b.wide_cumulative_difficulty, b.wide_difficulty))
         bt = b.miner_tx
-        insert_transaction(c, bt)
+        with profiler.profile("insert cb transaction"):
+            insert_transaction(c, bt)
 #        c.execute(INSERT_TRANSACTION, (bt.version, bt.hash_hex, bt.fee, bt.block_height, bt.unlock_time))
         bt.tx_id = c.lastrowid
         for t in b.txs:

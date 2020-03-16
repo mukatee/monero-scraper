@@ -39,6 +39,7 @@ class TxIn:
     coinbase: bool = False
 
     def __init__(self, amount, key_offsets, key_image, out_details, coinbase = False):
+        self.txin_id = None
         self.amount = amount
         self.key_offsets = key_offsets
         self.key_image = key_image
@@ -73,18 +74,20 @@ class Transaction:
     #when was this transaction first seen
     receive_time = None
     #list of associated tx_ins for this transaction (existing tx_outs)
-    tx_ins: List[TxIn] = []
+    tx_ins: List[TxIn] = None
     #list of tx_outs to generate from this transaction
-    tx_outs: List[TxOut] = []
+    tx_outs: List[TxOut] = None
 
     def __init__(self, version, hash_hex, fee, unlock_time, receive_time):
+        self.tx_id = None
         self.version = version
         self.hash_hex = hash_hex
         self.fee = fee
+        self.block_height = None
         self.unlock_time = unlock_time
         self.receive_time = receive_time
         #these are needed to overwrite the lists or they will be class-level variables. ugh
-        self.tx_inx = []
+        self.tx_ins = []
         self.tx_outs = []
 
 def from_json(tx_data, block_height):

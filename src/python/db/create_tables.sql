@@ -5,12 +5,12 @@
 
     CREATE TABLE blocks (
         height INT UNSIGNED NOT NULL UNIQUE,
-        block_size SMALLINT UNSIGNED NOT NULL,
-        weight SMALLINT UNSIGNED NOT NULL,
+        block_size MEDIUMINT UNSIGNED NOT NULL, /* First block over small int seems to be 85341 */
+        weight MEDIUMINT UNSIGNED NOT NULL, /* First block over small int seems to be 85341 also for this. */
         difficulty BIGINT NOT NULL,
         cumulative_difficulty BIGINT NOT NULL,
         hash CHAR(64) NOT NULL,
-        long_term_weight SMALLINT UNSIGNED NOT NULL,
+        long_term_weight MEDIUMINT UNSIGNED NOT NULL, /* First block over small int seems to be 85341 also for this. */
         major_version TINYINT UNSIGNED NOT NULL,
         minor_version TINYINT UNSIGNED NOT NULL,
         nonce BIGINT UNSIGNED NOT NULL,
