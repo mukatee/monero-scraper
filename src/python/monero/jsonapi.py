@@ -59,8 +59,8 @@ def mempool():
     txs = []
     for tx in res.get('transactions', []):
         block_height = -1 #using -1 for transaction pool
-        fee = tx["fee"]
-        print(fee)
+        #fee = tx["fee"]
+        #print(fee)
         txs.append(transaction.from_json(tx["tx_json"], block_height))
     return txs
 

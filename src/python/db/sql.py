@@ -3,9 +3,11 @@ __author__ = 'teemu kanstren'
 from monero.transaction import Transaction
 from monero.block import Block
 from mysql.connector.connection import MySQLConnection, MySQLCursor
-import traceback
 from codeprofile import profiler
+import logging
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 #https://stackoverflow.com/questions/775296/mysql-parameterized-queries
 INSERT_BLOCK = "INSERT INTO blocks (height, block_size, weight, difficulty, cumulative_difficulty, hash, long_term_weight, major_version, minor_version, nonce, reward, block_time, wide_cumulative_difficulty, wide_difficulty) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -75,6 +77,6 @@ def insert_block(conn: MySQLConnection, block: Block):
         conn.commit()
         c.close()
     except Exception as e:
+        logger.exception(f"ERROR AT HEIGHT:{block.height}") #should automatically dump the stack
         conn.rollback()
-        traceback.print_exc()
         c.close()

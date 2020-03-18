@@ -72,7 +72,7 @@
         key_hex CHAR(64) NOT NULL,
         mask_hex CHAR(64) NOT NULL,
         unlocked BOOLEAN NOT NULL,
-        PRIMARY KEY (tx_id, txin_id, height, key_hex),
+/**        PRIMARY KEY (tx_id, txin_id, height, key_hex), <- block 327625 has a a txin with the same output details twice. hash 1c979b266366569f64509502968ad43e9eeb851b297511e683118d0cafee05ee , from block 00320816, amount 0.111111111111  */
         CONSTRAINT fk_output_details_txin_id
           FOREIGN KEY (txin_id)
           REFERENCES txins (txin_id),
