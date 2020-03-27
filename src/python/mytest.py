@@ -28,7 +28,7 @@ if db_height[0] is None:
     db_height = (0,)
 
 profiler.collect_raw = False
-block = daemon.get_block(height=327624)
+block = daemon.get_block(height=383000)
 top_height = daemon.get_height()
 for x in range(db_height[0] + 1, top_height):
     with profiler.profile("get block"):

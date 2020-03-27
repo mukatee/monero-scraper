@@ -27,7 +27,7 @@
         hash CHAR(64) NOT NULL,
         fee BIGINT UNSIGNED NOT NULL,
         height INT UNSIGNED NOT NULL,
-        unlocktime INT UNSIGNED NOT NULL,
+        unlocktime BIGINT UNSIGNED NOT NULL, /** The daemon docs say this is block height, but actually can also be a timestamp in epoch seconds or millis. huh. for example, block 383000 has 1420722551128, so int is not enough. */
         PRIMARY KEY (tx_id),
         CONSTRAINT fk_tx_height
           FOREIGN KEY (height)
