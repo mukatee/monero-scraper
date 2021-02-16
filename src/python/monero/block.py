@@ -34,6 +34,7 @@ class Block:
     reward = 0
     wide_cumulative_difficulty = ""
     wide_difficulty = ""
+    blockhashing_blob = ""
 
     #-- from rpc msg "top level"
     credits = 0
@@ -54,7 +55,7 @@ class Block:
         self.difficulty_top64 = header["difficulty_top64"]
         self.hash = header["hash"]
         self.long_term_weight = header["long_term_weight"]
-        self.miner_tx_hash = header["miner_tx_hash"]
+        self.miner_tx_hash = rpc_dict["miner_tx_hash"]
         self.major_version = header["major_version"]
         self.nonce = header["nonce"]
         self.num_txes = header["num_txes"]
@@ -69,5 +70,9 @@ class Block:
         self.untrusted = rpc_dict["untrusted"]
         miner_tx_hash_list = [header["miner_tx_hash"]]
         self.miner_tx = jsonapi.get_transactions(miner_tx_hash_list)[0]
-        self.txs = jsonapi.get_transactions(rpc_dict["tx_hashes"])
+        self.tx_hashes = rpc_dict["tx_hashes"]
+        self.txs = jsonapi.get_transactions(self.tx_hashes)
+        #the blockhashing blob is there only if you run a specially patched daemon. made on for myself to check the merkle calculations
+        if "blockhashing_blob" in rpc_dict:
+            self.blockhashing_blob = rpc_dict["blockhashing_blob"]
         pass

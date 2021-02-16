@@ -62,6 +62,11 @@ def raw_jsonrpc_request(method, params=None):
         raise Unauthorized("401 Unauthorized. Invalid RPC user name or password.")
     elif rsp.status_code != 200:
         raise MoneroException(f"Invalid HTTP status {rsp.status_code} for method {method}.")
+    import os
+    wd = os.getcwd()
+    with open("kkkk.json", "wb") as aa:
+        print(wd)
+        aa.write(rsp.content)
     result = rsp.json()
     _ppresult = json.dumps(result, indent=2, sort_keys=True)
     _log.debug(u"Result:\n{result}".format(result=_ppresult))

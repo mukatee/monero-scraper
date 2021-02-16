@@ -44,8 +44,6 @@ def get_block(hash: str = None, height: int = None) -> block.Block:
 def get_transactions(tx_hashes: List) -> List:
     if len(tx_hashes) == 0:
         return []
-    #what is this?
-#    tx_hashes.append("82388254268f9887db936d20db89929f721d9cad4a5b1a1795bf05b2a511224c")
     # need decode_as_json to get actual vin and a vout values for transaction inputs and outputs
     transactions = rpc.raw_request('/get_transactions', {'txs_hashes': tx_hashes, "decode_as_json": True})
     txs = []
@@ -64,7 +62,6 @@ def mempool():
         txs.append(transaction.from_json(tx["tx_json"], block_height))
     return txs
 
-
 def headers(start_height, end_height = None):
     end_height = end_height or start_height
     res = rpc.raw_jsonrpc_request('get_block_headers_range', {
@@ -73,3 +70,14 @@ def headers(start_height, end_height = None):
     if res['status'] == 'OK':
         return res['headers']
     raise Exception()
+
+def get_block_hash_blob(height):
+    res = rpc.raw_jsonrpc_request('get_block', {'height': height})
+    return res["blob"]
+
+def get_coinbase_hash(height):
+    res = rpc.raw_jsonrpc_request('get_block', {'height': height})
+    return res["block_header"]["miner_tx_hash"]
+
+def get_block_template(height):
+    return
