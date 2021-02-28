@@ -13,6 +13,11 @@ logging.basicConfig(filename='monero_scraper.log',
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+stream = logging.StreamHandler()
+stream.setLevel(logging.DEBUG)
+streamformat = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
+stream.setFormatter(streamformat)
+logger.addHandler(stream)
 #
 #rpc.init(_host="nodes.hashvault.pro")
 rpc.init(_host="localhost")
@@ -26,6 +31,7 @@ db_height = sql.get_max_block(cnx)
 if db_height[0] is None:
     #this is the case when the table is empty
     db_height = (0,)
+print(f"table height: ${db_height}")
 
 profiler.collect_raw = False
 block = daemon.get_block(height=383000)

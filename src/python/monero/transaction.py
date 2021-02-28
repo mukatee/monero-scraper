@@ -24,6 +24,11 @@ class OutDetails:
         self.tx_id = tx_id
         self.unlocked = unlocked
 
+    def __str__(self):
+        return f"height={self.height},keyhex={self.key_hex},maskhex={self.mask_hex},txid={self.tx_id},unlocked={self.unlocked}"
+
+    __repr__ = __str__
+
 #details about a tx_in for a transaction
 class TxIn:
     txin_id:int = None
@@ -46,6 +51,11 @@ class TxIn:
         self.out_details = out_details
         self.coinbase = coinbase
 
+    def __str__(self):
+        return f"txin_id={self.txin_id},amount={self.amount},keyoffs={len(self.key_offsets)},keyimg={self.key_image},out_details={len(self.out_details)},cb={self.coinbase}"
+
+    __repr__ = __str__
+
 #describes a tx_out. just the basic values
 class TxOut:
     #amount in spent tx. seems to be 0 in later parts of the blockchain
@@ -56,6 +66,11 @@ class TxOut:
     def __init__(self, amount, target_key):
         self.amount = amount
         self.target_key = target_key
+
+    def __str__(self):
+        return f"amount={self.amount},tgtkey={self.target_key}"
+
+    __repr__ = __str__
 
 #the transaction itself, containing the txins, txouts, and the rest of the details
 class Transaction:
@@ -89,6 +104,11 @@ class Transaction:
         #these are needed to overwrite the lists or they will be class-level variables. ugh
         self.tx_ins = []
         self.tx_outs = []
+
+    def __str__(self):
+        return f"txid={self.tx_id},v={self.version},fee={self.fee},height={self.block_height},unlocktime={self.unlock_time},receivetime={self.receive_time},txins={len(self.tx_ins)},txouts={len(self.tx_outs)}"
+
+    __repr__ = __str__
 
 def from_json(tx_data, block_height):
     tx = json.loads(tx_data)
