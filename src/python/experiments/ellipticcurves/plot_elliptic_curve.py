@@ -3,13 +3,22 @@ import matplotlib.pyplot as plt
 from scipy import spatial
 
 #https://stackoverflow.com/questions/10818546/finding-index-of-nearest-point-in-numpy-arrays-of-x-and-y-coordinates
-def closest_point(min_x, min_y, max_x, max_y, k, points, point1, point2, n_slices):
+#find the closest point to a line in the given set of points
+#parameter points list defines points to check
+#(min_x, min_y) is the start point of line
+#(max_x, max_y) is the end point of line
+#n_slices is the number of slices to cut the line into
+#returns the point from given ṕoints list to any slice generated for the line
+#this is used to find curve point (P3) closest to line from P1 to P2
+def closest_point(min_x, min_y, max_x, max_y, points, n_slices):
     cur_x = max_x
     cur_y = max_y
     y_slice = (max_y - min_y) / n_slices
     x_slice = (max_x - min_x) / n_slices
     closest_points = []
+    #path is a list of the generated points for the line
     path = []
+    #distances is the list of distances of each generated point from the curve
     distances = []
     for x in range(n_slices):
         cur_x -= x_slice
@@ -18,111 +27,74 @@ def closest_point(min_x, min_y, max_x, max_y, k, points, point1, point2, n_slice
         #print(f"{cur_x},{cur_y}: {closest}")
         distance, idx = closest
         closest_point = tuple(points[idx])
-#        if closest_point not in closest_points:
         closest_points.append(closest_point)
         path.append((cur_x, cur_y))
         distances.append(distance)
     return closest_points, path, distances
 
+#plot a line on the given curve (ćplot)
+#idx1 = index on curve segments to pick P1 (line start)
+#idx2 = index on curve sgments to pick P2 (line end)
+#x_offsetter = how much further to draw the line from P1 and P2 (to have some margin on sides)
+#ylim_bounds = put some space on top and bottom if needed, to give space for extra line bounds
+#n_slices = how many slices to calculate for the line to look for the overlapping points
 def plot_line(cplot, idx1, idx2, x_offsetter, ylim_bounds=None, n_slices=10000):
+    #this gets the line segments with coordinates from matplotlib
+    #will pick the P1 and P2 from those segments later
     c_coords = cplot.allsegs[0][0]
     cx_coords = cplot.allsegs[0][0][:, 0]
     cy_coords = cplot.allsegs[0][0][:, 1]
+
+    #pick x and y coordinates for P1
     myx1 = c_coords[idx1][0]
     myy1 = c_coords[idx1][1]
+    #pick x and y coordinates for P2
     myx2 = c_coords[idx2][0]
     myy2 = c_coords[idx2][1]
+
+    #calculate x and y axis length of line, to split it into n_slices
     x_diff = (myx2 - myx1)
     y_diff = (myy2 - myy1)
+    #k is the multiplier to get y from x slice idx
     k = y_diff / x_diff
-    # k = x_diff / y_diff
     max_x = max(cx_coords)
     x_diff2 = max_x - myx2
-    max_y_original = max(cy_coords)
-    min_y_original = min(cy_coords)
     max_y = myy2 + x_diff2 * k
     min_x = min(cx_coords)
     x_diff3 = (min_x - myx1)*x_offsetter
     min_x += x_diff3*(x_offsetter-1)
     min_y = myy1 + x_diff3 * k
-    #    plt.plot((myx1, myx2), (myy1, myy2), '-k')
-    #    plt.plot((myx1, max_x), (myy1, max_y), '-k')
-#    if min_y_original < min_y:
-#        min_y = min_y_original
-#    if max_y_original < max_y:
-#        max_y = max_y_original
     axes = plt.axes()
     if ylim_bounds is not None:
         axes.set_ylim(ylim_bounds)
+        #plot the line,
     plt.plot((min_x, max_x), (min_y, max_y), '-k', color='red')
     plt.grid()
-#    plt.ylim(-4.5, 4.5)
 
-    closest_points, path, distances = closest_point(min_x, min_y, max_x, max_y, k, c_coords, (myx1, myy1), (myx2, myy2), n_slices)
-    closest_x = [x[0] for x in closest_points]
-    closest_y = [x[1] for x in closest_points]
-    #    plt.plot(closest_x, closest_y, marker='o', color='orange', ls='')
-    min_dist = np.argmin(distances)
+    #find P3, the one that overlaps the curve at the third point
+    closest_points, path, distances = closest_point(min_x, min_y, max_x, max_y, c_coords, n_slices)
     min_indices = np.argpartition(distances, 3)[:3]
 
-    path_x = [x[0] for x in path]
-    path_y = [x[1] for x in path]
-    #    plt.plot(path_x, path_y, marker='o', color='green', ls='')
-
+    #plot the 3 closest dots on the line, they should be P1, P2, and P3 from the article
     closest_x = [closest_points[x][0] for x in min_indices]
     closest_y = [closest_points[x][1] for x in min_indices]
     plt.plot(closest_x, closest_y, marker='o', color='red', ls='')
 
 
-#https://asecuritysite.com/comms/plot06
+#i picked the base plotting code from https://asecuritysite.com/comms/plot06
+#thanks!
 def curve25519():
     plt.close()
     a = 486662
     b = 1
 
     y, x = np.ogrid[-200000000:200000000:100j, -500000:500000:100j]
-    z = pow(y, 2) - pow(x, 3) - pow(x,2) * a - x * b
+#    z = pow(y, 2) - pow(x, 3) - pow(x,2) * a - x * b
     cplot = plt.contour(x.ravel(), y.ravel(), pow(y, 2) - pow(x, 3) - pow(x,2) * a - x * b, [0])
     plot_line(cplot, 50, 200, 1)
-#     c_coords = cplot.allsegs[0][0]
-#     cx_coords = cplot.allsegs[0][0][:,0]
-#     myx1 = c_coords[50][0]
-#     myy1 = c_coords[50][1]
-#     myx2 = c_coords[200][0]
-#     myy2 = c_coords[200][1]
-#     x_diff = (myx2-myx1)
-#     y_diff = (myy2-myy1)
-#     k = y_diff / x_diff
-#     #k = x_diff / y_diff
-#     max_x = max(cx_coords)
-#     x_diff2 = max_x - myx2
-#     max_y = myy2+x_diff2*k
-#     min_x = min(cx_coords)
-#     x_diff3 = min_x - myx1
-#     min_y = myy1+x_diff3*k
-# #    plt.plot((myx1, myx2), (myy1, myy2), '-k')
-# #    plt.plot((myx1, max_x), (myy1, max_y), '-k')
-#     #plt.plot((min_x, max_x), (min_y, max_y), '-k', color='red')
-#     #plt.grid()
-#
-#     closest_points, path, distances = closest_point(min_x, min_y, max_x, max_y, k, c_coords, (myx1, myy1), (myx2, myy2))
-#     closest_x = [x[0] for x in closest_points]
-#     closest_y = [x[1] for x in closest_points]
-# #    plt.plot(closest_x, closest_y, marker='o', color='orange', ls='')
-#     min_dist = np.argmin(distances)
-#     min_indices = np.argpartition(distances, 3)[:3]
-#
-#     path_x = [x[0] for x in path]
-#     path_y = [x[1] for x in path]
-# #    plt.plot(path_x, path_y, marker='o', color='green', ls='')
-#
-#     closest_x = [closest_points[x][0] for x in min_indices]
-#     closest_y = [closest_points[x][1] for x in min_indices]
-    #plt.plot(closest_x, closest_y, marker='o', color='red', ls='')
-
     plt.savefig("25519_.png")
 
-#https://asecuritysite.com/comms/plot05?a=0&b=7
+#and this one is from here: https://asecuritysite.com/comms/plot05?a=0&b=7
 def curveSecp256k1():
     plt.close()
     a = 0
@@ -131,10 +103,11 @@ def curveSecp256k1():
     y, x = np.ogrid[-5:5:100j, -5:5:100j]
     z = pow(y, 2) - pow(x, 3) - x * a - b
     cplot = plt.contour(x.ravel(), y.ravel(), pow(y, 2) - pow(x, 3) - x * a - b, [0])
+    #this curve seems to need fewer slices to get the points looking better
     plot_line(cplot, 110, 145, 3, [-5, 5], n_slices=100)
-#    plt.grid()
     plt.savefig("Secp256k1_.png")
 
+#basic commitment example from article. just a base point and a multiplier
 def basic_commitment_example():
     plt.close()
     a = 486662
@@ -158,6 +131,7 @@ def basic_commitment_example():
     plt.plot(myx2, myy2, marker='o', color='red', ls='')
     plt.savefig("basic_commitment_example.png")
 
+#commitment with base point, multiplier and blinding factor naively added. also from article.
 def blinded_naive_commitment_example():
     plt.close()
     a = 486662
@@ -186,6 +160,7 @@ def blinded_naive_commitment_example():
     plt.plot(myx3, myy3, marker='o', color='red', ls='')
     plt.savefig("blinded_commitment_example.png")
 
+#example of a commitment with two base points, one for blinding, one for amount
 def blinded_smart_commitment_example():
     plt.close()
     a = 486662
@@ -223,6 +198,8 @@ def blinded_smart_commitment_example():
     plt.plot(x_c, y_c, marker='o', color='red', ls='')
     plt.savefig("blinded_smart_example.png")
 
+#monero commitment example from the article, calculating only the H (amount)
+#it has a wrong name with _g suffix, it should be _h. had it confused at some point
 def monero_pedersen_example_g():
     plt.close()
     a = 486662
@@ -281,6 +258,8 @@ def monero_pedersen_example_g():
     plt.plot(x_txout_fee, y_txout_fee, marker='o', color='green', ls='')
     plt.savefig("monero_output_commitment_g.png")
 
+#the monero example, visualizing only the G (blinding factor) part of the calculation
+#it has the wrong _h suffix, had them confused at some point
 def monero_pedersen_example_h():
     plt.close()
     a = 486662
@@ -343,8 +322,11 @@ def monero_pedersen_example_h():
     plt.savefig("monero_output_commitment_h_fee.png")
 
 if __name__ == '__main__':
+    #create base plots for the two EC curves in the article
 #    curve25519()
     curveSecp256k1()
+
+    #Build the simplified ('fake') commitment visualizations from the article, one at a time
 #     basic_commitment_example()
 #     blinded_naive_commitment_example()
     blinded_smart_commitment_example()
