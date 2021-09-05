@@ -33,10 +33,16 @@ def create_database(cnx, cursor):
             print(err)
             exit(1)
 
-def create_tables(cursor):
+def create_tables(cursor, coin_type):
     my_path = os.path.dirname(os.path.realpath(__file__))
-    with open(f'{my_path}/create_tables.sql', 'r') as file:
-        sql = file.read()
+    if coin_type == 'xmr':
+        with open(f'{my_path}/create_tables_xmr.sql', 'r') as file:
+            sql = file.read()
+    elif coin_type == 'xhv':
+        with open(f'{my_path}/create_tables_xhv.sql', 'r') as file:
+            sql = file.read()
+    else:
+        raise NotImplementedError(f"Unknown coin type: {coin_type}")
     tables_sql = sql.split(";")
     tables_sql = [table_sql.strip() for table_sql in tables_sql]
     for table_sql in tables_sql:
@@ -67,14 +73,13 @@ def get_cnx():
         cursor.close()
     return cnx
 
-
-def main():
+def main(coin_type):
     cnx = mariadb.connect(host=DB_HOST,
                                          user = DB_USER, password = DB_PW,  autocommit = False)
 #                                         user = DB_USER, password = DB_PW, database = DB_NAME)
     cursor = cnx.cursor()
     create_database(cnx, cursor)
-    create_tables(cursor)
+    create_tables(cursor, coin_type)
     # https://stackoverflow.com/questions/11583083/python-commands-out-of-sync-you-cant-run-this-command-now
     cursor.close()
     cursor = cnx.cursor()
@@ -86,6 +91,6 @@ def main():
     cnx.close()
 
 if __name__== "__main__":
-  main()
+  main('xmr')
 
 

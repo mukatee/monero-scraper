@@ -198,7 +198,7 @@ def blinded_smart_commitment_example():
     plt.plot(x_c, y_c, marker='o', color='red', ls='')
     plt.savefig("blinded_smart_example.png")
 
-#monero commitment example from the article, calculating only the H (amount)
+#moneroscraper commitment example from the article, calculating only the H (amount)
 #it has a wrong name with _g suffix, it should be _h. had it confused at some point
 def monero_pedersen_example_g():
     plt.close()
@@ -258,7 +258,7 @@ def monero_pedersen_example_g():
     plt.plot(x_txout_fee, y_txout_fee, marker='o', color='green', ls='')
     plt.savefig("monero_output_commitment_g.png")
 
-#the monero example, visualizing only the G (blinding factor) part of the calculation
+#the moneroscraper example, visualizing only the G (blinding factor) part of the calculation
 #it has the wrong _h suffix, had them confused at some point
 def monero_pedersen_example_h():
     plt.close()

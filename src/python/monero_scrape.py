@@ -1,31 +1,24 @@
 __author__ = 'teemu kanstren'
 
-from monero import jsonapi, rpc
-from db import sql, create_tables
+from moneroscraper import jsonapi, rpc, logging_config
+from src.python.moneroscraper.db import sql, create_tables
 from codeprofile import profiler
-import logging
 import io
 
-logging.basicConfig(filename='monero_scraper.log',
-                    format='%(asctime)s - %(name)s - %(message)s',
-                    filemode='w',
-                    level=logging.WARNING)
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger = logging_config.create_logger(__name__)
 
-stream = logging.StreamHandler()
-stream.setLevel(logging.DEBUG)
-streamformat = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
-stream.setFormatter(streamformat)
-logger.addHandler(stream)
-#
 #rpc.init(_host="nodes.hashvault.pro")
-rpc.init(_host="localhost")
+rpc.init(_host="localhost", _port=17750)
+jsonapi.init()
+#rpc.init(_host="localhost")
 daemon = jsonapi
 info = daemon.info()
 logger.info(info)
 logger.info(f"current deamon height: {daemon.get_height()}")
+#genesis_block = daemon.get_block(height=0)
+
 mtx = daemon.get_transactions(["c6988cbd8eec02efdb6ce8e43e5c54c8af898dec8d331025248a066645a259dd"])
+create_tables.main()
 cnx = create_tables.get_cnx()
 db_height = sql.get_max_block(cnx)
 if db_height[0] is None:
@@ -34,7 +27,7 @@ if db_height[0] is None:
 print(f"table height: ${db_height}")
 
 profiler.collect_raw = False
-block = daemon.get_block(height=383000)
+block = daemon.get_block(height=884280)
 top_height = daemon.get_height()
 for x in range(db_height[0] + 1, top_height):
     with profiler.profile("get block"):
@@ -44,7 +37,6 @@ for x in range(db_height[0] + 1, top_height):
     if x%500 == 0:
         logger.info(f"block height: {x}")
         hack_f = io.StringIO()
-        #TODO: add text generation option to profiler
         profiler.print_run_stats(file=hack_f)
         stats_str = hack_f.getvalue()
         logger.info(stats_str)

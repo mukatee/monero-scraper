@@ -1,7 +1,6 @@
 __author__ = 'teemu kanstren'
 
 from .transaction import Transaction
-from . import jsonapi
 from typing import Dict, List
 
 #following fields seem to be from "json" field copied into block_header:
@@ -42,7 +41,9 @@ class Block:
     top_hash = ""
     untrusted = ""
     miner_tx: Transaction = None
-    tx_hashes: List[Transaction] = None
+    txs: List[Transaction] = None
+    miner_tx_hash_list: List[str] = None
+    tx_hashes: List[str] = None
 
     def __init__(self, rpc_dict: Dict):
         header = rpc_dict["block_header"]
@@ -68,10 +69,11 @@ class Block:
         self.status = rpc_dict["status"]
         self.top_hash = rpc_dict["top_hash"]
         self.untrusted = rpc_dict["untrusted"]
-        miner_tx_hash_list = [header["miner_tx_hash"]]
-        self.miner_tx = jsonapi.get_transactions(miner_tx_hash_list)[0]
+        self.miner_tx_hash_list = [header["miner_tx_hash"]]
+        if len(self.miner_tx_hash_list) > 1:
+            #TODO: use logger
+            print(f"!!! height={self.height}, miner tx list is larger than 1: {self.miner_tx_hash_list}")
         self.tx_hashes = rpc_dict["tx_hashes"]
-        self.txs = jsonapi.get_transactions(self.tx_hashes)
         #the blockhashing blob is there only if you run a specially patched daemon. made on for myself to check the merkle calculations
         if "blockhashing_blob" in rpc_dict:
             self.blockhashing_blob = rpc_dict["blockhashing_blob"]

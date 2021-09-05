@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 mysql-connector-python = "*"
 codeprofile = "*"
+deficrawler = "*"
 
 [requires]
 python_version = "3.8"

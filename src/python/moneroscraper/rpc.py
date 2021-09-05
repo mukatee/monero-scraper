@@ -1,5 +1,3 @@
-from datetime import datetime
-import operator
 import json
 import logging
 import requests
@@ -29,7 +27,6 @@ def init(_protocol='http', _host='127.0.0.1', _port=18081, _path='/json_rpc',
     password = _password
     timeout = _timeout
     verify_ssl_certs = _verify_ssl_certs
-
 
 def raw_request(path, data):
     hdr = {'Content-Type': 'application/json'}
